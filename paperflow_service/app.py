@@ -6,8 +6,9 @@ from pathlib import Path
 from typing import Any
 
 from mcp.server.fastmcp import FastMCP
+from mcp.types import ToolAnnotations
 from starlette.requests import Request
-from starlette.responses import HTMLResponse, JSONResponse
+from starlette.responses import HTMLResponse, JSONResponse, PlainTextResponse
 from starlette.routing import Route
 
 from .core import PaperFlowStore
@@ -53,139 +54,139 @@ def confirm_result(conf) -> dict[str, Any]:
         "instruction": "把 confirmation_url 交给用户。只有用户在页面点击确认后，服务端门禁才会解锁。",
     }
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(readOnlyHint=False, openWorldHint=False, destructiveHint=False))
 def paperflow_create_project(title: str = "") -> dict[str, Any]:
     """Create a persistent paper project and return its paper_id. Use before any gated writing workflow."""
     try: return ok(store.create_project(title))
     except Exception as e: return err(e)
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(readOnlyHint=True, openWorldHint=False, destructiveHint=False))
 def paperflow_list_projects(limit: int = 20) -> dict[str, Any]:
     """List recently updated PaperFlow projects so a new chat can resume an existing paper."""
     try: return ok(store.list_projects(limit))
     except Exception as e: return err(e)
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(readOnlyHint=True, openWorldHint=False, destructiveHint=False))
 def paperflow_status(paper_id: str) -> dict[str, Any]:
     """Read authoritative gate/section/quality state for one paper project."""
     try: return ok(store.status(paper_id))
     except Exception as e: return err(e)
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(readOnlyHint=False, openWorldHint=False, destructiveHint=True))
 def paperflow_set_thesis(paper_id: str, claim: str, evidence: str, boundary: str, selling_point: str) -> dict[str, Any]:
     """Store the Gate 1 thesis anchor."""
     try: return ok(store.set_thesis(paper_id, claim, evidence, boundary, selling_point))
     except Exception as e: return err(e)
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(readOnlyHint=False, openWorldHint=False, destructiveHint=True))
 def paperflow_set_angles(paper_id: str, angles: list[dict[str, str]]) -> dict[str, Any]:
     """Store exactly 2-3 narrative-angle candidates."""
     try: return ok(store.set_angles(paper_id, angles))
     except Exception as e: return err(e)
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(readOnlyHint=False, openWorldHint=False, destructiveHint=False))
 def paperflow_request_gate1_confirmation(paper_id: str, angle: str) -> dict[str, Any]:
     """Create a one-time user confirmation link for Gate 1."""
     try: return ok(confirm_result(store.request_gate1(paper_id, angle)))
     except Exception as e: return err(e)
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(readOnlyHint=False, openWorldHint=False, destructiveHint=True))
 def paperflow_set_intro_map(paper_id: str, challenges: list[str], contributions: list[dict[str, Any]], mapping: list[str]) -> dict[str, Any]:
     """Store Gate 2 challenge/contribution map."""
     try: return ok(store.set_intro_map(paper_id, challenges, contributions, mapping))
     except Exception as e: return err(e)
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(readOnlyHint=False, openWorldHint=False, destructiveHint=False))
 def paperflow_request_gate2_confirmation(paper_id: str) -> dict[str, Any]:
     """Create a one-time user confirmation link for Gate 2."""
     try: return ok(confirm_result(store.request_gate2(paper_id)))
     except Exception as e: return err(e)
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(readOnlyHint=False, openWorldHint=False, destructiveHint=True))
 def paperflow_set_intro_paragraph_plan(paper_id: str, n: int, opening_challenge: str, support: str, closing_problem: str) -> dict[str, Any]:
     """Store the plan for intro challenge paragraph N."""
     try: return ok(store.set_intro_paragraph_plan(paper_id, n, opening_challenge, support, closing_problem))
     except Exception as e: return err(e)
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(readOnlyHint=False, openWorldHint=False, destructiveHint=False))
 def paperflow_request_intro_paragraph_confirmation(paper_id: str, n: int) -> dict[str, Any]:
     """Create a one-time confirmation link for intro paragraph N."""
     try: return ok(confirm_result(store.request_intro_para(paper_id, n)))
     except Exception as e: return err(e)
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(readOnlyHint=True, openWorldHint=False, destructiveHint=False))
 def paperflow_begin_intro_paragraph(paper_id: str, n: int) -> dict[str, Any]:
     """Authorize drafting intro paragraph N."""
     try: return ok(store.begin_intro_paragraph(paper_id, n))
     except Exception as e: return err(e)
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(readOnlyHint=False, openWorldHint=False, destructiveHint=False))
 def paperflow_finish_intro_paragraph(paper_id: str, n: int) -> dict[str, Any]:
     """Mark intro paragraph N complete."""
     try: return ok(store.finish_intro_paragraph(paper_id, n))
     except Exception as e: return err(e)
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(readOnlyHint=False, openWorldHint=False, destructiveHint=True))
 def paperflow_set_method_core(paper_id: str, innovation: str, not_simple_combination: str, evidence: str, modules: list[dict[str, str]]) -> dict[str, Any]:
     """Store Gate 3 core innovation."""
     try: return ok(store.set_method_core(paper_id, innovation, not_simple_combination, evidence, modules))
     except Exception as e: return err(e)
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(readOnlyHint=False, openWorldHint=False, destructiveHint=False))
 def paperflow_request_gate3_confirmation(paper_id: str) -> dict[str, Any]:
     """Create a one-time user confirmation link for Gate 3."""
     try: return ok(confirm_result(store.request_gate3(paper_id)))
     except Exception as e: return err(e)
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(readOnlyHint=False, openWorldHint=False, destructiveHint=True))
 def paperflow_set_abstract_plan(paper_id: str, s1: str, s2_items: list[str], s3: str, mapping: str) -> dict[str, Any]:
     """Store abstract plan. Requires confirmed Gate 2 and Gate 3."""
     try: return ok(store.set_abstract_plan(paper_id, s1, s2_items, s3, mapping))
     except Exception as e: return err(e)
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(readOnlyHint=False, openWorldHint=False, destructiveHint=False))
 def paperflow_request_abstract_plan_confirmation(paper_id: str) -> dict[str, Any]:
     """Create a one-time confirmation link for abstract plan."""
     try: return ok(confirm_result(store.request_abstract_plan(paper_id)))
     except Exception as e: return err(e)
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(readOnlyHint=False, openWorldHint=False, destructiveHint=False))
 def paperflow_begin_section(paper_id: str, section: str) -> dict[str, Any]:
     """Hard gate for formal drafting."""
     try: return ok(store.begin_section(paper_id, section))
     except Exception as e: return err(e)
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(readOnlyHint=False, openWorldHint=False, destructiveHint=False))
 def paperflow_finish_section(paper_id: str, section: str) -> dict[str, Any]:
     """Mark a formal section completed."""
     try: return ok(store.finish_section(paper_id, section))
     except Exception as e: return err(e)
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(readOnlyHint=False, openWorldHint=False, destructiveHint=True))
 def paperflow_submit_manuscript(paper_id: str, manuscript_text: str, method_acronym: str = "") -> dict[str, Any]:
     """Submit the current manuscript; new submission invalidates lint/review."""
     try: return ok(store.submit_manuscript(paper_id, manuscript_text, method_acronym))
     except Exception as e: return err(e)
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(readOnlyHint=False, openWorldHint=False, destructiveHint=True))
 def paperflow_record_selfcheck(paper_id: str, notes: str) -> dict[str, Any]:
     """Record reviewer-style self-check notes."""
     try: return ok(store.record_selfcheck(paper_id, notes))
     except Exception as e: return err(e)
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(readOnlyHint=False, openWorldHint=False, destructiveHint=False))
 def paperflow_run_lint(paper_id: str) -> dict[str, Any]:
     """Run bundled paper_lint.py against stored manuscript."""
     try: return ok(store.run_lint(paper_id, LINT_SCRIPT))
     except Exception as e: return err(e)
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(readOnlyHint=False, openWorldHint=False, destructiveHint=True))
 def paperflow_record_review(paper_id: str, notes: str) -> dict[str, Any]:
     """Record Gate 4 cross-section review."""
     try: return ok(store.record_review(paper_id, notes))
     except Exception as e: return err(e)
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(readOnlyHint=False, openWorldHint=False, destructiveHint=False))
 def paperflow_deliver(paper_id: str) -> dict[str, Any]:
     """Final Gate 4."""
     try: return ok(store.deliver(paper_id))
@@ -193,6 +194,24 @@ def paperflow_deliver(paper_id: str) -> dict[str, Any]:
 
 async def health(_: Request) -> JSONResponse:
     return JSONResponse({"ok": True, "service": "paperflow-gate", "db": DB_PATH})
+
+async def landing(_: Request) -> HTMLResponse:
+    return page("PaperFlow Gate", """<h1>PaperFlow Gate</h1><p>Server-enforced workflow gates for the Academic Paper Writer plugin.</p><p><a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> · <a href="/support">Support</a></p>""")
+
+async def privacy(_: Request) -> HTMLResponse:
+    return page("Privacy Policy", """<h1>Privacy Policy</h1><p>PaperFlow Gate stores paper-project workflow state and manuscript text supplied through its MCP tools so gated writing can resume across chats. Data is stored in the service's persistent Railway volume and is not sold or used for advertising.</p><p>The service does not intentionally collect passwords, payment information, or unrelated conversation history. Users should not submit secrets or regulated personal data. Project data remains on this deployment until deleted through service administration.</p><p>For questions, use the support page.</p>""")
+
+async def terms(_: Request) -> HTMLResponse:
+    return page("Terms of Use", """<h1>Terms of Use</h1><p>PaperFlow Gate is provided as an academic-writing workflow aid. Users remain responsible for the accuracy, originality, citations, research ethics, and submission compliance of their manuscripts.</p><p>The service enforces workflow gates but does not guarantee publication, acceptance, factual correctness, or compliance with any journal, institution, or law.</p>""")
+
+async def support(_: Request) -> HTMLResponse:
+    return page("Support", """<h1>Support</h1><p>For source code, issue tracking, and deployment history, visit the project repository:</p><p><a href="https://github.com/WC0624/paperflow-gate">github.com/WC0624/paperflow-gate</a></p>""")
+
+async def openai_apps_challenge(_: Request):
+    token = os.getenv("OPENAI_APPS_CHALLENGE_TOKEN", "").strip()
+    if not token:
+        return PlainTextResponse("not configured", status_code=404)
+    return PlainTextResponse(token, media_type="text/plain")
 
 def page(title: str, body: str) -> HTMLResponse:
     return HTMLResponse(f"""<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{html.escape(title)}</title><style>
@@ -221,7 +240,12 @@ async def confirm_submit(request: Request) -> HTMLResponse:
         return page("处理失败", f"<h1>处理失败</h1><p>{html.escape(str(e))}</p>")
 
 routes = [
+    Route("/", landing, methods=["GET"]),
     Route("/health", health, methods=["GET"]),
+    Route("/privacy", privacy, methods=["GET"]),
+    Route("/terms", terms, methods=["GET"]),
+    Route("/support", support, methods=["GET"]),
+    Route("/.well-known/openai-apps-challenge", openai_apps_challenge, methods=["GET"]),
     Route("/confirm/{token}", confirm_page, methods=["GET"]),
     Route("/confirm/{token}", confirm_submit, methods=["POST"]),
 ]
