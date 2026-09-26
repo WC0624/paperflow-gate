@@ -225,4 +225,5 @@ routes = [
     Route("/confirm/{token}", confirm_page, methods=["GET"]),
     Route("/confirm/{token}", confirm_submit, methods=["POST"]),
 ]
-app = mcp.streamable_http_app()\napp.router.routes[:0] = routes
+app = mcp.streamable_http_app()
+app.router.routes[:0] = routes
