@@ -225,4 +225,4 @@ routes = [
     Route("/confirm/{token}", confirm_page, methods=["GET"]),
     Route("/confirm/{token}", confirm_submit, methods=["POST"]),
 ]
-app = mcp.streamable_http_app(stateless_http=True, json_response=True, host=HOST, custom_starlette_routes=routes)
+app = mcp.streamable_http_app()\napp.router.routes[:0] = routes
